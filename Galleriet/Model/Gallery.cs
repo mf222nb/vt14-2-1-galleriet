@@ -10,36 +10,38 @@ namespace Galleriet.Model
 {
     public class Gallery
     {
-        private static Regex ApprovedExenstions;
+        private static Regex ApprovedExtensions;
         private static Regex SantizePath;
         private static string PhysicalUploadedImagePath;
 
         static Gallery()
         {
-            ApprovedExenstions = new Regex("^.*/.(gif|jpg|png)$", RegexOptions.IgnoreCase);
+            ApprovedExtensions = new Regex("^.*/.(gif|jpg|png)$", RegexOptions.IgnoreCase);
             
             var invalidChars = new string(Path.GetInvalidFileNameChars());
-            SantizePath = new Regex(string.Format("[0]", Regex.Escape(invalidChars)));
+            SantizePath = new Regex(string.Format("[{0}]", Regex.Escape(invalidChars)));
 
             PhysicalUploadedImagePath = Path.Combine(AppDomain.CurrentDomain.GetData("APPBASE").ToString(), "Content/Images");
         }
 
         public IEnumerable<string> GetImageNames()
         {
-            var di = new DirectoryInfo(PhysicalUploadedImagePath);
-            throw new NotImplementedException();
+            var files = new DirectoryInfo(PhysicalUploadedImagePath).GetFiles();
+            List<string> images = new List<string>(50);
+            for (int i = 0; i < files.Length; i++)
+            {
+                images.Add(files[i].ToString());
+            }
+            images.Select(fileName => ApprovedExtensions.IsMatch(fileName));
+            images.TrimExcess();
+            images.Sort();
+
+            return images.AsReadOnly();
         }
 
         public bool ImageExists(string name)
         {
-            if (!File.Exists(name))
-            {
-                return false;
-            }
-            else
-	        {
-                return true;
-	        }
+            return File.Exists(string.Format("{0}/{1}", PhysicalUploadedImagePath, name));
         }
 
         private bool IsValidImage(Image image)

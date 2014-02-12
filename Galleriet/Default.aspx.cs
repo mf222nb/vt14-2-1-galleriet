@@ -20,5 +20,10 @@ namespace Galleriet
         {
 
         }
+
+        public IEnumerable<System.IO.FileInfo> Repeater1_GetData()
+        {
+            return null;
+        }
     }
 }

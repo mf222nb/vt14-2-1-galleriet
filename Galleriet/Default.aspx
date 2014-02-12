@@ -12,15 +12,15 @@
     </header>
     <form id="form1" runat="server">
     <div>
-        <asp:Repeater ID="Repeater1" runat="server">
+        <asp:Repeater ID="Repeater1" runat="server" ItemType="System.IO.FileInfo" SelectMethod="Repeater1_GetData">
             <ItemTemplate>
-                <asp:HyperLink ID="HyperLink1" runat="server">HyperLink</asp:HyperLink>
+                <asp:HyperLink ID="HyperLink1" runat="server" NavigateUrl='<%# Item.Name %>'><%# Item.Name %></asp:HyperLink>
             </ItemTemplate>
         </asp:Repeater>
         
         <asp:FileUpload ID="FileUpload1" runat="server" />
-        <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ErrorMessage="RequiredFieldValidator"></asp:RequiredFieldValidator>
-        <asp:RegularExpressionValidator ID="RegularExpressionValidator1" runat="server" ErrorMessage="RegularExpressionValidator"></asp:RegularExpressionValidator>  
+        <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ErrorMessage="RequiredFieldValidator" ControlToValidate="FileUpload1" Display="Dynamic"></asp:RequiredFieldValidator>
+        <asp:RegularExpressionValidator ID="RegularExpressionValidator1" runat="server" ErrorMessage="RegularExpressionValidator" ControlToValidate="FileUpload1" Display="Dynamic"></asp:RegularExpressionValidator>  
         <asp:Button ID="ChoseButton" runat="server" Text="Välj fil" Onclick="ChoseButton_Click"/>
     </div>
     </form>

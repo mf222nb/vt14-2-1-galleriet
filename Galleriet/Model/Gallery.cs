@@ -13,6 +13,7 @@ namespace Galleriet.Model
         private static Regex ApprovedExtensions;
         private static Regex SantizePath;
         private static string PhysicalUploadedImagePath;
+        private static string PhysicalUploadedThumbnailPath;
 
         static Gallery()
         {
@@ -21,12 +22,14 @@ namespace Galleriet.Model
             var invalidChars = new string(Path.GetInvalidFileNameChars());
             SantizePath = new Regex(string.Format("[{0}]", Regex.Escape(invalidChars)));
 
-            PhysicalUploadedImagePath = Path.Combine(AppDomain.CurrentDomain.GetData("APPBASE").ToString(), "Content/Images");
+            PhysicalUploadedImagePath = Path.Combine(AppDomain.CurrentDomain.GetData("APPBASE").ToString(), @"Content\Images");
+            PhysicalUploadedThumbnailPath = Path.Combine(AppDomain.CurrentDomain.GetData("APPBASE").ToString(), @"Content\Images\Thumbnails");
+
         }
 
         public IEnumerable<string> GetImageNames()
         {
-            var files = new DirectoryInfo(PhysicalUploadedImagePath).GetFiles();
+            var files = new DirectoryInfo(PhysicalUploadedThumbnailPath).GetFiles();
             List<string> images = new List<string>(50);
             for (int i = 0; i < files.Length; i++)
             {
@@ -36,10 +39,10 @@ namespace Galleriet.Model
             images.TrimExcess();
             images.Sort();
 
-            return images.AsReadOnly();
+            return images.AsEnumerable();
         }
 
-        public bool ImageExists(string name)
+        public static bool ImageExists(string name)
         {
             return File.Exists(string.Format("{0}/{1}", PhysicalUploadedImagePath, name));
         }
@@ -53,7 +56,40 @@ namespace Galleriet.Model
 
         public string SaveImage(Stream stream, string fileName)
         {
-            throw new NotImplementedException();
+            SantizePath.Replace(fileName, String.Empty);
+            if (!ApprovedExtensions.IsMatch(fileName))
+            {
+                throw new ArgumentException("Du kan bara spara filer bilder med formaten jpg, png och gif");    
+            }
+            if (ImageExists(fileName))
+            {
+                var extension = Path.GetExtension(fileName);
+                var imgName = Path.GetFileNameWithoutExtension(fileName);
+                
+                int i = 0;
+                do
+                {
+                    fileName = String.Format("{0}{1}{2}", imgName, i, extension);
+                    i++;
+                } while (ImageExists(fileName));
+            }
+            try
+            {
+                var image = System.Drawing.Image.FromStream(stream); // stream -> ström med bild
+                if (IsValidImage(image))
+                {
+                    image.Save(Path.Combine(PhysicalUploadedImagePath, fileName));
+                }
+                var thumbnail = image.GetThumbnailImage(60, 45, null, System.IntPtr.Zero);
+                thumbnail.Save(Path.Combine(PhysicalUploadedThumbnailPath, fileName)); // path -> fullständig fysisk filnamn inklusive sökväg
+            }
+            catch (Exception)
+            {
+                
+                throw;
+            }
+            
+            return fileName;
         }
     }
 }

@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using Galleriet.Model;
+using System.IO;
 
 namespace Galleriet
 {
@@ -12,18 +13,24 @@ namespace Galleriet
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            
-            
         }
 
-        protected void ChoseButton_Click(object sender, EventArgs e)
+        protected void UploadButton_Click(object sender, EventArgs e)
         {
+            if (IsValid)
+            {
+                var fileContent = FileUpload.FileContent;
+                var fileName = FileUpload.FileName;
 
+                Gallery gallery = new Gallery();
+                gallery.SaveImage(fileContent, fileName);
+            }
         }
 
-        public IEnumerable<System.IO.FileInfo> Repeater1_GetData()
+        public IEnumerable<System.String> Repeater1_GetData()
         {
-            return null;
+            Gallery G = new Gallery();
+            return G.GetImageNames();
         }
     }
 }

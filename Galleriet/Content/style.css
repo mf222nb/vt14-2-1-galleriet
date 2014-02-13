@@ -1,0 +1,30 @@
+﻿body {
+    width: 800px;
+    margin: 0 auto;
+    border-bottom: 1px solid #000000;
+}
+
+.header {
+    border-bottom: 2px solid #000000;
+}
+
+.thumbs {
+    height: 50px;
+    overflow: auto;
+}
+
+#ValidationSummary {
+    color: red;
+}
+
+#SuccessPanel {
+    width: 100%;
+    border: 2px solid #86ff68;
+    background-color: #acff98;
+    color: green;
+    margin-bottom: 10px;
+}
+
+#form1 {
+    margin-top: 20px;
+}
